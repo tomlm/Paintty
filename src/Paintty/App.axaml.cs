@@ -16,8 +16,8 @@ namespace Paintty;
 
 public partial class App : Application
 {
-    public const int DefaultWidth = 640;
-    public const int DefaultHeight = 480;
+    public const int DefaultWidth = 1024;
+    public const int DefaultHeight = 1024;
 
     static App()
     {

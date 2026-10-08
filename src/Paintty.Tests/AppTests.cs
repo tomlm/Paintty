@@ -33,7 +33,7 @@ public class AppTests() : ConsoloniaAppTestBase<App>(new PixelBufferSize(120, 40
     {
         await AssertScreenHas("File", "Edit", "Image", "Adjustments", "View", "Help");
         await AssertScreenHas("Pencil", "Brush", "Eraser", "Fill", "Text", "Rectangle", "Ellipse");
-        await AssertScreenHas("640 × 480", "Untitled");
+        await AssertScreenHas("1024 × 1024", "Untitled");
     }
 
     [Test]
