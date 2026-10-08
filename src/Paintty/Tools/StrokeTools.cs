@@ -94,7 +94,7 @@ public sealed partial class BrushTool : StrokeTool
     public override char Hotkey => 'B';
 
     [ObservableProperty] private int _size = 4;
-    [ObservableProperty] private bool _antialias;
+    [ObservableProperty] private bool _antialias = true;
 
     protected override float StrokeWidth => Size;
 

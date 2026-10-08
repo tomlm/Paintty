@@ -182,7 +182,7 @@ public class ToolTests
     {
         using var document = Pixels.Blank(6, 6);
         var host = new TestHost(document);
-        var line = new LineTool();
+        var line = new LineTool { Antialias = false }; // exact pixels along the diagonal
 
         line.Press(host, At(0, 0, shift: true));
         line.Release(host, At(5, 4, shift: true));

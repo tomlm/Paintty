@@ -18,7 +18,7 @@ public abstract partial class ShapeTool : ToolBase
     private bool _shift;
 
     [ObservableProperty] private int _width = 1;
-    [ObservableProperty] private bool _antialias;
+    [ObservableProperty] private bool _antialias = true;
 
     protected bool IsDragging => _start is not null;
 
