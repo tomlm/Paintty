@@ -1,0 +1,95 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Paintty.ViewModels"
+             xmlns:tools="using:Paintty.Tools"
+             x:Class="Paintty.Views.ToolOptionsView"
+             x:DataType="vm:ToolboxViewModel">
+    <UserControl.Styles>
+        <Style Selector="StackPanel.options">
+            <Setter Property="Orientation" Value="Horizontal" />
+            <Setter Property="Spacing" Value="2" />
+        </Style>
+        <Style Selector="StackPanel.options > Label">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="Width" Value="10" />
+            <Setter Property="FormatString" Value="0" />
+        </Style>
+    </UserControl.Styles>
+
+    <DockPanel Background="{DynamicResource ThemeAlternativeBackgroundBrush}">
+        <TextBlock DockPanel.Dock="Left" Margin="1,0,2,0" VerticalAlignment="Center"
+                   Text="{Binding SelectedTool.Name}" FontWeight="Bold" />
+
+        <ContentControl Content="{Binding SelectedTool}">
+            <ContentControl.DataTemplates>
+
+                <DataTemplate DataType="tools:BrushTool">
+                    <StackPanel Classes="options">
+                        <Label Content="Si_ze" Target="Size" />
+                        <NumericUpDown Name="Size" Value="{Binding Size}" Minimum="1" Maximum="200" />
+                        <CheckBox Content="_Antialias" IsChecked="{Binding Antialias}" />
+                    </StackPanel>
+                </DataTemplate>
+
+                <DataTemplate DataType="tools:EraserTool">
+                    <StackPanel Classes="options">
+                        <Label Content="Si_ze" Target="Size" />
+                        <NumericUpDown Name="Size" Value="{Binding Size}" Minimum="1" Maximum="200" />
+                        <CheckBox Content="To _transparent" IsChecked="{Binding ToTransparent}" />
+                    </StackPanel>
+                </DataTemplate>
+
+                <DataTemplate DataType="tools:LineTool">
+                    <StackPanel Classes="options">
+                        <Label Content="_Width" Target="Width" />
+                        <NumericUpDown Name="Width" Value="{Binding Width}" Minimum="1" Maximum="200" />
+                        <CheckBox Content="_Antialias" IsChecked="{Binding Antialias}" />
+                        <TextBlock Text="Shift snaps to 45°" VerticalAlignment="Center" Opacity="0.6" />
+                    </StackPanel>
+                </DataTemplate>
+
+                <DataTemplate DataType="tools:FilledShapeTool">
+                    <StackPanel Classes="options">
+                        <Label Content="_Width" Target="Width" />
+                        <NumericUpDown Name="Width" Value="{Binding Width}" Minimum="1" Maximum="200" />
+                        <ComboBox ItemsSource="{x:Static tools:FilledShapeTool.FillModes}"
+                                  SelectedItem="{Binding FillMode}" />
+                        <CheckBox Content="_Antialias" IsChecked="{Binding Antialias}" />
+                        <TextBlock Text="Shift makes it square" VerticalAlignment="Center" Opacity="0.6" />
+                    </StackPanel>
+                </DataTemplate>
+
+                <DataTemplate DataType="tools:FillTool">
+                    <StackPanel Classes="options">
+                        <Label Content="_Tolerance %" Target="Tolerance" />
+                        <NumericUpDown Name="Tolerance" Value="{Binding Tolerance}" Minimum="0" Maximum="100" />
+                    </StackPanel>
+                </DataTemplate>
+
+                <DataTemplate DataType="tools:TextTool">
+                    <StackPanel Classes="options">
+                        <ComboBox Width="24" ItemsSource="{x:Static tools:TextTool.FontFamilies}"
+                                  SelectedItem="{Binding FontFamily}" />
+                        <Label Content="Si_ze" Target="FontSize" />
+                        <NumericUpDown Name="FontSize" Value="{Binding FontSize}" Minimum="4" Maximum="400" />
+                        <CheckBox Content="_Bold" IsChecked="{Binding Bold}" />
+                        <CheckBox Content="_Antialias" IsChecked="{Binding Antialias}" />
+                    </StackPanel>
+                </DataTemplate>
+
+                <DataTemplate DataType="tools:SelectTool">
+                    <TextBlock VerticalAlignment="Center" Opacity="0.6"
+                               Text="Drag to select · drag inside to move · Esc to drop" />
+                </DataTemplate>
+
+                <DataTemplate DataType="tools:ToolBase">
+                    <TextBlock VerticalAlignment="Center" Opacity="0.6"
+                               Text="Left button: primary colour · right button: secondary" />
+                </DataTemplate>
+
+            </ContentControl.DataTemplates>
+        </ContentControl>
+    </DockPanel>
+</UserControl>

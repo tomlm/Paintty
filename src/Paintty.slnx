@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Paintty.Tests/Paintty.Tests.csproj" />
+  <Project Path="Paintty/Paintty.csproj" />
+</Solution>

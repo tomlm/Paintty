@@ -1,0 +1,114 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Paintty.ViewModels"
+        xmlns:views="using:Paintty.Views"
+        xmlns:managedWindows="clr-namespace:Consolonia.ManagedWindows;assembly=Consolonia.ManagedWindows"
+        x:Class="Paintty.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="{Binding Title}">
+    <Window.Styles>
+        <managedWindows:AutoManagedWindowStyles />
+    </Window.Styles>
+
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Ctrl+N" Command="{Binding NewCommand}" />
+        <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenCommand}" />
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveCommand}" />
+        <KeyBinding Gesture="Ctrl+Shift+S" Command="{Binding SaveAsCommand}" />
+        <KeyBinding Gesture="Ctrl+Q" Command="{Binding ExitCommand}" />
+        <KeyBinding Gesture="Ctrl+Z" Command="{Binding UndoCommand}" />
+        <KeyBinding Gesture="Ctrl+Y" Command="{Binding RedoCommand}" />
+        <KeyBinding Gesture="Ctrl+X" Command="{Binding CutCommand}" />
+        <KeyBinding Gesture="Ctrl+C" Command="{Binding CopyCommand}" />
+        <KeyBinding Gesture="Ctrl+V" Command="{Binding PasteCommand}" />
+        <KeyBinding Gesture="Ctrl+A" Command="{Binding SelectAllCommand}" />
+        <KeyBinding Gesture="Ctrl+D" Command="{Binding DeselectCommand}" />
+        <KeyBinding Gesture="Delete" Command="{Binding EraseSelectionCommand}" />
+        <KeyBinding Gesture="Ctrl+Shift+X" Command="{Binding CropToSelectionCommand}" />
+        <KeyBinding Gesture="Ctrl+R" Command="{Binding ResizeCommand}" />
+        <KeyBinding Gesture="Ctrl+Shift+R" Command="{Binding CanvasSizeCommand}" />
+        <KeyBinding Gesture="Ctrl+H" Command="{Binding RotateCommand}" CommandParameter="90" />
+        <KeyBinding Gesture="Ctrl+G" Command="{Binding RotateCommand}" CommandParameter="270" />
+        <KeyBinding Gesture="Ctrl+J" Command="{Binding RotateCommand}" CommandParameter="180" />
+        <KeyBinding Gesture="Ctrl+I" Command="{Binding InvertCommand}" />
+        <KeyBinding Gesture="Ctrl+Shift+G" Command="{Binding GrayscaleCommand}" />
+        <KeyBinding Gesture="Ctrl+OemPlus" Command="{Binding Canvas.ZoomInCommand}" />
+        <KeyBinding Gesture="Ctrl+Add" Command="{Binding Canvas.ZoomInCommand}" />
+        <KeyBinding Gesture="Ctrl+OemMinus" Command="{Binding Canvas.ZoomOutCommand}" />
+        <KeyBinding Gesture="Ctrl+Subtract" Command="{Binding Canvas.ZoomOutCommand}" />
+        <KeyBinding Gesture="Ctrl+D0" Command="{Binding Canvas.ActualSizeCommand}" />
+        <KeyBinding Gesture="Ctrl+B" Command="{Binding Canvas.ZoomToFitCommand}" />
+    </Window.KeyBindings>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New…" InputGesture="Ctrl+N" Command="{Binding NewCommand}" />
+                <MenuItem Header="_Open…" InputGesture="Ctrl+O" Command="{Binding OpenCommand}" />
+                <MenuItem Header="_Save" InputGesture="Ctrl+S" Command="{Binding SaveCommand}" />
+                <MenuItem Header="Save _As…" InputGesture="Ctrl+Shift+S" Command="{Binding SaveAsCommand}" />
+                <Separator />
+                <MenuItem Header="E_xit" InputGesture="Ctrl+Q" Command="{Binding ExitCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Undo" InputGesture="Ctrl+Z" Command="{Binding UndoCommand}" />
+                <MenuItem Header="_Redo" InputGesture="Ctrl+Y" Command="{Binding RedoCommand}" />
+                <Separator />
+                <MenuItem Header="Cu_t" InputGesture="Ctrl+X" Command="{Binding CutCommand}" />
+                <MenuItem Header="_Copy" InputGesture="Ctrl+C" Command="{Binding CopyCommand}" />
+                <MenuItem Header="_Paste" InputGesture="Ctrl+V" Command="{Binding PasteCommand}" />
+                <MenuItem Header="_Erase Selection" InputGesture="Delete" Command="{Binding EraseSelectionCommand}" />
+                <Separator />
+                <MenuItem Header="Select _All" InputGesture="Ctrl+A" Command="{Binding SelectAllCommand}" />
+                <MenuItem Header="_Deselect" InputGesture="Ctrl+D" Command="{Binding DeselectCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Image">
+                <MenuItem Header="Crop to _Selection" InputGesture="Ctrl+Shift+X" Command="{Binding CropToSelectionCommand}" />
+                <MenuItem Header="_Resize…" InputGesture="Ctrl+R" Command="{Binding ResizeCommand}" />
+                <MenuItem Header="Canvas Si_ze…" InputGesture="Ctrl+Shift+R" Command="{Binding CanvasSizeCommand}" />
+                <Separator />
+                <MenuItem Header="Flip _Horizontal" Command="{Binding FlipHorizontalCommand}" />
+                <MenuItem Header="Flip _Vertical" Command="{Binding FlipVerticalCommand}" />
+                <Separator />
+                <MenuItem Header="Rotate 90° _Clockwise" InputGesture="Ctrl+H"
+                          Command="{Binding RotateCommand}" CommandParameter="90" />
+                <MenuItem Header="Rotate 90° C_ounter-clockwise" InputGesture="Ctrl+G"
+                          Command="{Binding RotateCommand}" CommandParameter="270" />
+                <MenuItem Header="Rotate _180°" InputGesture="Ctrl+J"
+                          Command="{Binding RotateCommand}" CommandParameter="180" />
+            </MenuItem>
+            <MenuItem Header="_Adjustments">
+                <MenuItem Header="_Invert Colors" InputGesture="Ctrl+I" Command="{Binding InvertCommand}" />
+                <MenuItem Header="_Black and White" InputGesture="Ctrl+Shift+G" Command="{Binding GrayscaleCommand}" />
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="Zoom _In" InputGesture="Ctrl+OemPlus" Command="{Binding Canvas.ZoomInCommand}" />
+                <MenuItem Header="Zoom _Out" InputGesture="Ctrl+OemMinus" Command="{Binding Canvas.ZoomOutCommand}" />
+                <MenuItem Header="_Actual Size" InputGesture="Ctrl+D0" Command="{Binding Canvas.ActualSizeCommand}" />
+                <MenuItem Header="Zoom to _Window" InputGesture="Ctrl+B" Command="{Binding Canvas.ZoomToFitCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About Paintty" Command="{Binding AboutCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <!-- Options for the selected tool, picked by tool type. -->
+        <views:ToolOptionsView DockPanel.Dock="Top" DataContext="{Binding Toolbox}" />
+
+        <!-- Status bar -->
+        <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="3"
+              Background="{DynamicResource ThemeAlternativeBackgroundBrush}">
+            <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+            <TextBlock Grid.Column="1" Text="{Binding SelectionText, StringFormat='Selection {0}'}"
+                       IsVisible="{Binding SelectionText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            <TextBlock Grid.Column="2" Text="{Binding Canvas.CursorText}" MinWidth="10" />
+            <TextBlock Grid.Column="3" Text="{Binding ImageSizeText}" MinWidth="12" />
+        </Grid>
+
+        <views:PaletteView DockPanel.Dock="Bottom" DataContext="{Binding Palette}" />
+
+        <views:ToolboxView DockPanel.Dock="Left" DataContext="{Binding Toolbox}" />
+
+        <views:CanvasView DataContext="{Binding Canvas}" />
+    </DockPanel>
+</Window>

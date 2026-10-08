@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Paintty.ViewModels"
+             x:Class="Paintty.Views.CanvasView"
+             x:DataType="vm:CanvasViewModel">
+    <ScrollViewer Name="Scroller"
+                  HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto"
+                  Background="{DynamicResource ThemeShadeBrush}">
+        <!-- The surface takes the pointer (and keeps it while dragging); the image only shows pixels. -->
+        <Border Name="Surface"
+                Background="Transparent"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Cursor="Cross">
+            <Image Name="Picture"
+                   Source="{Binding DisplayBitmap}"
+                   Width="{Binding DisplayWidth}"
+                   Height="{Binding DisplayHeight}"
+                   Stretch="Fill"
+                   RenderOptions.BitmapInterpolationMode="None" />
+        </Border>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,27 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# Others
+[Ll]og/
+[Ll]ogs/
+*.log
+
+# This project ships a launch profile, so it is tracked rather than ignored.
+!Properties/launchSettings.json

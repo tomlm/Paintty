@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Description>A paint program for the terminal, in the spirit of Paint and Paint.NET.</Description>
+    <Company>Iciclecreek</Company>
+    <Authors>Tom Laird-McConnell</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/tomlm/Paintty</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/tomlm/Paintty</RepositoryUrl>
+    <Copyright>Tom Laird-McConnell All Rights Reserved</Copyright>
+    <RootNamespace>Paintty</RootNamespace>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <!-- Consolonia is referenced from source (the bitmapstuff branch) until its bitmap and
+         pointer work ships, so a package built now would point at an unpublished Consolonia. -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackAsTool>true</PackAsTool>
+    <PackageId>Paintty</PackageId>
+    <ToolCommandName>paintty</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+    <None Include="../../icon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Consolonia\src\Consolonia\Consolonia.csproj" />
+    <ProjectReference Include="..\..\..\Consolonia\src\Consolonia.ManagedWindows\Consolonia.ManagedWindows.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Skia" Version="12.0.3" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Paintty.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,98 @@
+<windowManager:ManagedWindow xmlns="https://github.com/avaloniaui"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:windowManager="clr-namespace:Iciclecreek.Avalonia.WindowManager;assembly=Iciclecreek.Avalonia.WindowManager"
+                             xmlns:dialogs="using:Paintty.ViewModels.Dialogs"
+                             xmlns:views="using:Paintty.Views"
+                             x:Class="Paintty.Views.Dialogs.DialogWindow"
+                             x:DataType="dialogs:IDialogViewModel"
+                             Title="{Binding Title}"
+                             WindowStartupLocation="CenterOwner"
+                             SizeToContent="WidthAndHeight"
+                             CanResize="False"
+                             Padding="1">
+    <windowManager:ManagedWindow.DataTemplates>
+
+        <DataTemplate DataType="dialogs:NewImageViewModel">
+            <Grid ColumnDefinitions="Auto,1,16" RowDefinitions="Auto,Auto" RowSpacing="1">
+                <Label Content="_Width" Target="WidthBox" VerticalAlignment="Center" />
+                <NumericUpDown Name="WidthBox" Grid.Column="2" Value="{Binding Width}"
+                               Minimum="1" Maximum="16384" FormatString="0" />
+                <Label Grid.Row="1" Content="_Height" Target="HeightBox" VerticalAlignment="Center" />
+                <NumericUpDown Name="HeightBox" Grid.Row="1" Grid.Column="2" Value="{Binding Height}"
+                               Minimum="1" Maximum="16384" FormatString="0" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="dialogs:ResizeViewModel">
+            <StackPanel Spacing="1">
+                <TextBlock Text="{Binding OriginalSize}" />
+                <Grid ColumnDefinitions="Auto,1,16" RowDefinitions="Auto,Auto" RowSpacing="1">
+                    <Label Content="_Width" Target="WidthBox" VerticalAlignment="Center" />
+                    <NumericUpDown Name="WidthBox" Grid.Column="2" Value="{Binding Width}"
+                                   Minimum="1" Maximum="16384" FormatString="0" />
+                    <Label Grid.Row="1" Content="_Height" Target="HeightBox" VerticalAlignment="Center" />
+                    <NumericUpDown Name="HeightBox" Grid.Row="1" Grid.Column="2" Value="{Binding Height}"
+                                   Minimum="1" Maximum="16384" FormatString="0" />
+                </Grid>
+                <CheckBox Content="_Keep aspect ratio" IsChecked="{Binding KeepAspectRatio}" />
+                <CheckBox Content="_Smooth resampling" IsChecked="{Binding Smooth}" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="dialogs:CanvasSizeViewModel">
+            <StackPanel Spacing="1">
+                <TextBlock Text="{Binding CurrentSize}" />
+                <Grid ColumnDefinitions="Auto,1,16" RowDefinitions="Auto,Auto,Auto" RowSpacing="1">
+                    <Label Content="_Width" Target="WidthBox" VerticalAlignment="Center" />
+                    <NumericUpDown Name="WidthBox" Grid.Column="2" Value="{Binding Width}"
+                                   Minimum="1" Maximum="16384" FormatString="0" />
+                    <Label Grid.Row="1" Content="_Height" Target="HeightBox" VerticalAlignment="Center" />
+                    <NumericUpDown Name="HeightBox" Grid.Row="1" Grid.Column="2" Value="{Binding Height}"
+                                   Minimum="1" Maximum="16384" FormatString="0" />
+                    <Label Grid.Row="2" Content="_Anchor" Target="AnchorBox" VerticalAlignment="Center" />
+                    <ComboBox Name="AnchorBox" Grid.Row="2" Grid.Column="2"
+                              ItemsSource="{x:Static dialogs:CanvasSizeViewModel.Anchors}"
+                              SelectedItem="{Binding Anchor}" HorizontalAlignment="Stretch" />
+                </Grid>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="dialogs:ColorEditorViewModel">
+            <Grid ColumnDefinitions="Auto,1,32,1,5" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="1">
+                <Label Content="_Red" Target="RedSlider" />
+                <Slider Name="RedSlider" Grid.Column="2" Minimum="0" Maximum="255" Value="{Binding Red}" />
+                <TextBlock Grid.Column="4" Text="{Binding Red}" />
+                <Label Grid.Row="1" Content="_Green" Target="GreenSlider" />
+                <Slider Name="GreenSlider" Grid.Row="1" Grid.Column="2" Minimum="0" Maximum="255" Value="{Binding Green}" />
+                <TextBlock Grid.Row="1" Grid.Column="4" Text="{Binding Green}" />
+                <Label Grid.Row="2" Content="_Blue" Target="BlueSlider" />
+                <Slider Name="BlueSlider" Grid.Row="2" Grid.Column="2" Minimum="0" Maximum="255" Value="{Binding Blue}" />
+                <TextBlock Grid.Row="2" Grid.Column="4" Text="{Binding Blue}" />
+                <Label Grid.Row="3" Content="_Alpha" Target="AlphaSlider" />
+                <Slider Name="AlphaSlider" Grid.Row="3" Grid.Column="2" Minimum="0" Maximum="255" Value="{Binding Alpha}" />
+                <TextBlock Grid.Row="3" Grid.Column="4" Text="{Binding Alpha}" />
+                <Label Grid.Row="4" Content="He_x" Target="HexBox" VerticalAlignment="Center" />
+                <StackPanel Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Orientation="Horizontal" Spacing="2">
+                    <TextBox Name="HexBox" Width="12" Text="{Binding Hex}" />
+                    <Border Width="8" Height="1" VerticalAlignment="Center"
+                            Background="{Binding Color, Converter={x:Static views:Converters.ColorToBrush}}" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="dialogs:TextInputViewModel">
+            <TextBox Width="40"
+                     Text="{Binding Text}" />
+        </DataTemplate>
+
+    </windowManager:ManagedWindow.DataTemplates>
+
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right"
+                    Spacing="1" Margin="0,1,0,0">
+            <Button Name="AcceptButton" Content="O_K" IsDefault="True" Command="{Binding AcceptCommand}" />
+            <Button Content="_Cancel" IsCancel="True" Command="{Binding CancelCommand}" />
+        </StackPanel>
+        <ContentControl Name="Body" Content="{Binding}" />
+    </DockPanel>
+</windowManager:ManagedWindow>
