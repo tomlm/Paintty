@@ -105,6 +105,65 @@ public class ImagingTests
     }
 
     [Test]
+    public void RotateFree_RightAngle_IsTheExactQuarterTurn()
+    {
+        using var bitmap = Bitmaps.Create(3, 2, SKColors.White);
+        bitmap.SetPixel(0, 0, SKColors.Black);
+
+        using var exact = Adjustments.Rotate(bitmap, 90);
+        using var free = Adjustments.RotateFree(bitmap, 90, expand: true);
+
+        Assert.That(Bitmaps.PixelsEqual(free, exact), Is.True);
+    }
+
+    [Test]
+    public void RotateFree_Expanded_GrowsToTheRotatedBounds()
+    {
+        using var bitmap = Bitmaps.Create(100, 50, SKColors.Black);
+
+        using var rotated = Adjustments.RotateFree(bitmap, 30, expand: true);
+
+        // 100cos30 + 50sin30 = 111.6, 100sin30 + 50cos30 = 93.3
+        Assert.That((rotated.Width, rotated.Height), Is.EqualTo((112, 94)));
+        Assert.That(rotated.GetPixel(56, 47), Is.EqualTo(SKColors.Black), "the middle is the image");
+        Assert.That(rotated.GetPixel(0, 0).Alpha, Is.EqualTo(0), "the uncovered corner is transparent");
+    }
+
+    [Test]
+    public void RotateFree_NegativeAngle_TurnsAnticlockwise()
+    {
+        using var bitmap = Bitmaps.Create(3, 2, SKColors.White);
+        bitmap.SetPixel(0, 0, SKColors.Black);
+
+        using var anticlockwise = Adjustments.RotateFree(bitmap, -90, expand: true);
+        using var threeQuarters = Adjustments.Rotate(bitmap, 270);
+
+        Assert.That(Bitmaps.PixelsEqual(anticlockwise, threeQuarters), Is.True);
+    }
+
+    [Test]
+    public void RotateFree_NotExpanded_KeepsTheSizeAndCropsTheCorners()
+    {
+        using var bitmap = Bitmaps.Create(40, 40, SKColors.Black);
+
+        using var rotated = Adjustments.RotateFree(bitmap, 45, expand: false);
+
+        Assert.That((rotated.Width, rotated.Height), Is.EqualTo((40, 40)));
+        Assert.That(rotated.GetPixel(20, 20), Is.EqualTo(SKColors.Black));
+        Assert.That(rotated.GetPixel(0, 0).Alpha, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void RotateFree_NotExpanded_QuarterTurnOfAnOblongKeepsItsSize()
+    {
+        using var bitmap = Bitmaps.Create(6, 2, SKColors.Black);
+
+        using var rotated = Adjustments.RotateFree(bitmap, 90, expand: false);
+
+        Assert.That((rotated.Width, rotated.Height), Is.EqualTo((6, 2)));
+    }
+
+    [Test]
     public void Mirror_Horizontal_ReversesRows()
     {
         using var bitmap = Bitmaps.Create(3, 1, SKColors.White);

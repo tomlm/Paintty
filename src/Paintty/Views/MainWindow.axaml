@@ -8,6 +8,13 @@
         Title="{Binding Title}">
     <Window.Styles>
         <managedWindows:AutoManagedWindowStyles />
+        <!-- Avalonia names the bracket keys "Oem4" and "OemCloseBrackets"; show what is on the key -->
+        <Style Selector="MenuItem.zoomIn /template/ TextBlock#PART_InputGestureText">
+            <Setter Property="Text" Value="[" />
+        </Style>
+        <Style Selector="MenuItem.zoomOut /template/ TextBlock#PART_InputGestureText">
+            <Setter Property="Text" Value="]" />
+        </Style>
     </Window.Styles>
 
     <Window.KeyBindings>
@@ -30,12 +37,9 @@
         <KeyBinding Gesture="Ctrl+H" Command="{Binding RotateCommand}" CommandParameter="90" />
         <KeyBinding Gesture="Ctrl+G" Command="{Binding RotateCommand}" CommandParameter="270" />
         <KeyBinding Gesture="Ctrl+J" Command="{Binding RotateCommand}" CommandParameter="180" />
+        <KeyBinding Gesture="Ctrl+Shift+H" Command="{Binding RotateFreeCommand}" />
         <KeyBinding Gesture="Ctrl+I" Command="{Binding InvertCommand}" />
         <KeyBinding Gesture="Ctrl+Shift+G" Command="{Binding GrayscaleCommand}" />
-        <KeyBinding Gesture="Ctrl+OemPlus" Command="{Binding Canvas.ZoomInCommand}" />
-        <KeyBinding Gesture="Ctrl+Add" Command="{Binding Canvas.ZoomInCommand}" />
-        <KeyBinding Gesture="Ctrl+OemMinus" Command="{Binding Canvas.ZoomOutCommand}" />
-        <KeyBinding Gesture="Ctrl+Subtract" Command="{Binding Canvas.ZoomOutCommand}" />
         <KeyBinding Gesture="Ctrl+D0" Command="{Binding Canvas.ActualSizeCommand}" />
         <KeyBinding Gesture="Ctrl+B" Command="{Binding Canvas.ZoomToFitCommand}" />
     </Window.KeyBindings>
@@ -70,24 +74,27 @@
                 <MenuItem Header="Flip _Horizontal" Command="{Binding FlipHorizontalCommand}" />
                 <MenuItem Header="Flip _Vertical" Command="{Binding FlipVerticalCommand}" />
                 <Separator />
+                <!-- the rotations turn the selection when there is one -->
                 <MenuItem Header="Rotate 90° _Clockwise" InputGesture="Ctrl+H"
                           Command="{Binding RotateCommand}" CommandParameter="90" />
                 <MenuItem Header="Rotate 90° C_ounter-clockwise" InputGesture="Ctrl+G"
                           Command="{Binding RotateCommand}" CommandParameter="270" />
                 <MenuItem Header="Rotate _180°" InputGesture="Ctrl+J"
                           Command="{Binding RotateCommand}" CommandParameter="180" />
+                <MenuItem Header="Ro_tate…" InputGesture="Ctrl+Shift+H" Command="{Binding RotateFreeCommand}" />
             </MenuItem>
             <MenuItem Header="_Adjustments">
                 <MenuItem Header="_Invert Colors" InputGesture="Ctrl+I" Command="{Binding InvertCommand}" />
                 <MenuItem Header="_Black and White" InputGesture="Ctrl+Shift+G" Command="{Binding GrayscaleCommand}" />
             </MenuItem>
             <MenuItem Header="_View">
-                <MenuItem Header="Zoom _In" InputGesture="Ctrl+OemPlus" Command="{Binding Canvas.ZoomInCommand}" />
-                <MenuItem Header="Zoom _Out" InputGesture="Ctrl+OemMinus" Command="{Binding Canvas.ZoomOutCommand}" />
+                <MenuItem Classes="zoomIn" Header="Zoom _In" InputGesture="OemOpenBrackets" Command="{Binding Canvas.ZoomInCommand}" />
+                <MenuItem Classes="zoomOut" Header="Zoom _Out" InputGesture="OemCloseBrackets" Command="{Binding Canvas.ZoomOutCommand}" />
                 <MenuItem Header="_Actual Size" InputGesture="Ctrl+D0" Command="{Binding Canvas.ActualSizeCommand}" />
                 <MenuItem Header="Zoom to _Window" InputGesture="Ctrl+B" Command="{Binding Canvas.ZoomToFitCommand}" />
             </MenuItem>
             <MenuItem Header="_Help">
+                <MenuItem Header="_Keyboard…" Command="{Binding KeyboardCommand}" />
                 <MenuItem Header="_About Paintty" Command="{Binding AboutCommand}" />
             </MenuItem>
         </Menu>
@@ -109,6 +116,6 @@
 
         <views:ToolboxView DockPanel.Dock="Left" DataContext="{Binding Toolbox}" />
 
-        <views:CanvasView DataContext="{Binding Canvas}" />
+        <views:CanvasView Name="CanvasView" DataContext="{Binding Canvas}" />
     </DockPanel>
 </Window>

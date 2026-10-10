@@ -26,6 +26,12 @@ public sealed class DialogService : IDialogService
 
     public Task<CanvasSizeRequest?> AskCanvasSizeAsync(ImageSize current) => ShowAsync(new CanvasSizeViewModel(current));
 
+    public Task<RotateRequest?> AskRotateAsync(bool selection, Action<RotateRequest> preview) =>
+        ShowAsync(new RotateViewModel(preview, selection));
+
+    public Task ShowShortcutsAsync(IReadOnlyList<ShortcutGroup> groups) =>
+        ShowAsync(new ShortcutsViewModel(groups));
+
     public Task<SKColor?> EditColorAsync(SKColor color) => ShowAsync(new ColorEditorViewModel(color));
 
     public Task<string?> PromptTextAsync(string title) => ShowAsync(new TextInputViewModel(title));

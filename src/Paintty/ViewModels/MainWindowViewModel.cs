@@ -213,9 +213,37 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
     private void FlipVertical() =>
         Document.ApplyToSelectionOrImage("Flip Vertical", bitmap => Adjustments.Mirror(bitmap, Flip.Vertical));
 
+    /// <summary>A quarter turn of the selection, or of the image when nothing is selected.</summary>
     [RelayCommand]
     private void Rotate(string degrees) =>
-        Document.ApplyToImage($"Rotate {degrees}°", bitmap => Adjustments.Rotate(bitmap, int.Parse(degrees)));
+        Document.TransformSelectionOrImage($"Rotate {degrees}°",
+            bitmap => Adjustments.Rotate(bitmap, int.Parse(degrees)), Palette.Secondary);
+
+    /// <summary>
+    ///     Rotate the selection, or the image when nothing is selected, by any angle, picked with a
+    ///     slider while the canvas shows the result.
+    /// </summary>
+    [RelayCommand]
+    private async Task RotateFreeAsync()
+    {
+        RotateRequest? request;
+        try
+        {
+            request = await _dialogs.AskRotateAsync(Document.Selection is not null, setting =>
+                Canvas.SetPreview(setting.Degrees == 0
+                    ? null
+                    : _ => Document.PreviewTransformSelectionOrImage(
+                        bitmap => Adjustments.RotateFree(bitmap, setting.Degrees, setting.Expand), Palette.Secondary)));
+        }
+        finally
+        {
+            Canvas.SetPreview(null);
+        }
+
+        if (request is null || request.Degrees % 360 == 0) return;
+        Document.TransformSelectionOrImage($"Rotate {request.Degrees:0.#}°",
+            bitmap => Adjustments.RotateFree(bitmap, request.Degrees, request.Expand), Palette.Secondary);
+    }
 
     // ── Adjustments ────────────────────────────────────────────────────────────────────────
 
@@ -234,6 +262,9 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         "Tools: " + string.Join(", ", Toolbox.Tools.Select(tool => $"{tool.Name} ({tool.Hotkey})")) + ".\n" +
         "X swaps the colours.\n\n" +
         $"Graphics: {Canvas.DisplayMetrics.Graphics}.");
+
+    [RelayCommand]
+    private Task KeyboardAsync() => _dialogs.ShowShortcutsAsync(KeyboardShortcuts.For(Toolbox));
 
     // ── plumbing ───────────────────────────────────────────────────────────────────────────
 

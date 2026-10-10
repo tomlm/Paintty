@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Consolonia;
 using Iciclecreek.Avalonia.WindowManager;
 using Microsoft.Extensions.DependencyInjection;
 using Paintty.Editing;
@@ -26,6 +27,13 @@ public partial class App : Application
         _ = new WindowsPanel();
     }
 
+    /// <summary>
+    /// XTSHIFTESCAPE: ask the terminal to send Shift+mouse to us rather than turn it into a text
+    /// selection, since Shift constrains the shape tools. Terminals that don't know it ignore it.
+    /// </summary>
+    private const string ClaimShift = "\u001b[>1s";
+    private const string ReleaseShift = "\u001b[>0s";
+
     public IServiceProvider Services { get; private set; } = null!;
 
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
@@ -38,6 +46,9 @@ public partial class App : Application
             var viewModel = Services.GetRequiredService<MainWindowViewModel>();
             var window = new MainWindow { DataContext = viewModel };
             desktop.MainWindow = window;
+
+            ConsoloniaLifetime.Console.WriteText(ClaimShift);
+            desktop.Exit += (_, _) => ConsoloniaLifetime.Console.WriteText(ReleaseShift);
 
             // paintty picture.png opens the picture.
             if (desktop.Args is [{ } path, ..] && File.Exists(path))
@@ -68,6 +79,7 @@ public partial class App : Application
         services.AddSingleton<ToolBase, LineTool>();
         services.AddSingleton<ToolBase, RectangleTool>();
         services.AddSingleton<ToolBase, EllipseTool>();
+        services.AddSingleton<ToolBase, PanTool>();
 
         services.AddSingleton<ToolboxViewModel>();
         services.AddSingleton<PaletteViewModel>();

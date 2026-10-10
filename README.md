@@ -13,18 +13,21 @@ paintty [image]
 ## What it does
 
 * Open PNG, JPEG, BMP, GIF, WebP and ICO; save PNG, JPEG and WebP (lossless).
-* Tools: select, pencil, brush, eraser, fill, colour picker, text, line, rectangle and ellipse.
+* Tools: select, pencil, brush, eraser, fill, colour picker, text, line, rectangle, ellipse and pan.
 * The left button draws with the primary colour, the right button with the secondary.
 * Rectangle selection that can be moved, cut, copied, pasted, erased and cropped to.
-* Resize, canvas size, flip, rotate, invert and black-and-white. Flips and the colour
-  adjustments apply to the selection when there is one.
+* Resize, canvas size, flip, rotate by quarter turns or by any angle (with a live preview),
+  invert and black-and-white. Flips and the colour adjustments apply to the selection when
+  there is one.
 * Undo and redo, and a prompt before unsaved changes are lost.
 
 ## Keys
 
+Help → Keyboard… shows the same table inside Paintty.
+
 | Key | Does |
 |---|---|
-| `S` `P` `B` `E` `F` `K` `T` `L` `R` `O` | Select, Pencil, Brush, Eraser, Fill, Color picker, Text, Line, Rectangle, Ellipse |
+| `S` `P` `B` `E` `F` `K` `T` `L` `R` `O` `H` | Select, Pencil, Brush, Eraser, Fill, Color picker, Text, Line, Rectangle, Ellipse, Pan |
 | `X` | Swap the primary and secondary colours |
 | `Shift` while dragging | Square rectangles and circles; lines snap to 45° |
 | `Esc` | Abandon the current drag, or drop a floating selection |
@@ -34,5 +37,8 @@ paintty [image]
 | `Ctrl+A` `Ctrl+D` `Ctrl+Shift+X` | Select all, Deselect, Crop to selection |
 | `Ctrl+R` `Ctrl+Shift+R` | Resize image, Canvas size |
 | `Ctrl+H` `Ctrl+G` `Ctrl+J` | Rotate 90° clockwise, counter-clockwise, 180° |
+| `Ctrl+Shift+H` | Rotate by any angle |
+| | Rotations turn the selection when there is one, leaving it floating to move |
 | `Ctrl+I` `Ctrl+Shift+G` | Invert colours, Black and white |
-| `Ctrl++` `Ctrl+-` `Ctrl+0` `Ctrl+B` | Zoom in, out, 100%, to window (also `Ctrl`+wheel) |
+| `[` `]` `Ctrl+0` `Ctrl+B` | Zoom in, out, 100%, to window (also `Ctrl`+wheel) |
+| Arrow keys, `Shift`+wheel, middle-drag | Pan (the wheel alone scrolls up and down) |

@@ -172,6 +172,159 @@ public class ViewModelTests
     }
 
     [Test]
+    public async Task RotateFree_AppliesTheChosenAngleAsOneUndoableEdit()
+    {
+        _dialogs.Rotate = new RotateRequest(30, Expand: true);
+
+        await _main.RotateFreeCommand.ExecuteAsync(null);
+
+        Assert.That((_main.Document.Width, _main.Document.Height), Is.EqualTo((14, 14)));
+        _main.UndoCommand.Execute(null);
+        Assert.That((_main.Document.Width, _main.Document.Height), Is.EqualTo((10, 10)));
+    }
+
+    [Test]
+    public void Rotate_WithASelection_TurnsTheSelectionAndLeavesItFloating()
+    {
+        // a 4x2 bar at (2,2); a quarter turn makes it 2x4 about the same centre, (3,1)-(5,5)
+        _main.Document.Bitmap.FillRect(new SKRectI(2, 2, 6, 4), SKColors.Black);
+        _main.Document.Select(new SKRectI(2, 2, 6, 4));
+
+        _main.RotateCommand.Execute("90");
+
+        Assert.That((_main.Document.Width, _main.Document.Height), Is.EqualTo((10, 10)), "the image keeps its size");
+        Assert.That(_main.Document.HasFloating, Is.True);
+        Assert.That(_main.Document.Selection, Is.EqualTo(new SKRectI(3, 1, 5, 5)));
+
+        _main.EscapeCommand.Execute(null);
+        Assert.That(Pixels.Map(_main.Document.Bitmap, SKColors.Black).Split('\n')[1..5],
+            Is.EqualTo(new[] { "...##.....", "...##.....", "...##.....", "...##....." }));
+        Assert.That(_main.Document.Bitmap.GetPixel(2, 2), Is.EqualTo(_main.Palette.Secondary), "the lift leaves the secondary colour");
+
+        _main.UndoCommand.Execute(null);
+        Assert.That(Pixels.Count(_main.Document.Bitmap, SKColors.Black), Is.EqualTo(8));
+        Assert.That(_main.Document.Bitmap.GetPixel(5, 3), Is.EqualTo(SKColors.Black), "undo puts the bar back");
+    }
+
+    [Test]
+    public async Task RotateFree_WithASelection_TurnsOnlyTheSelection()
+    {
+        _main.Document.Select(new SKRectI(2, 2, 6, 6));
+        _dialogs.Rotate = new RotateRequest(45, Expand: true);
+
+        await _main.RotateFreeCommand.ExecuteAsync(null);
+
+        Assert.That(_dialogs.RotatedSelection, Is.True);
+        Assert.That((_main.Document.Width, _main.Document.Height), Is.EqualTo((10, 10)));
+        // 4·cos45 + 4·sin45 = 5.66 → 6, centred on (4,4)
+        Assert.That(_main.Document.Selection, Is.EqualTo(new SKRectI(1, 1, 7, 7)));
+    }
+
+    [Test]
+    public void PreviewTransform_ShowsTheTurnedSelectionWithoutChangingTheImage()
+    {
+        _main.Document.Bitmap.FillRect(new SKRectI(2, 2, 6, 4), SKColors.Black);
+        _main.Document.Select(new SKRectI(2, 2, 6, 4));
+
+        using var preview = _main.Document.PreviewTransformSelectionOrImage(
+            bitmap => Adjustments.Rotate(bitmap, 90), SKColors.White);
+
+        Assert.That(preview.GetPixel(3, 1), Is.EqualTo(SKColors.Black));
+        Assert.That(preview.GetPixel(2, 2), Is.EqualTo(SKColors.White));
+        Assert.That(_main.Document.HasFloating, Is.False);
+        Assert.That(_main.Document.Bitmap.GetPixel(2, 2), Is.EqualTo(SKColors.Black), "the image is untouched");
+    }
+
+    [Test]
+    public async Task RotateFree_PreviewsWhileAskingAndStopsAfterwards()
+    {
+        bool previewedWhileAsking = false;
+        _dialogs.RotatePreviews = [new RotateRequest(45, true)];
+        _dialogs.WhileAsking = () => previewedWhileAsking = _main.Canvas.IsPreviewing;
+
+        await _main.RotateFreeCommand.ExecuteAsync(null); // cancelled: Rotate is null
+
+        Assert.That(previewedWhileAsking, Is.True);
+        Assert.That(_main.Canvas.IsPreviewing, Is.False);
+        Assert.That(_main.UndoCommand.CanExecute(null), Is.False, "cancelling changes nothing");
+    }
+
+    [Test]
+    public async Task RotateFree_ZeroDegrees_ChangesNothing()
+    {
+        _dialogs.Rotate = new RotateRequest(0, true);
+        await _main.RotateFreeCommand.ExecuteAsync(null);
+        Assert.That(_main.UndoCommand.CanExecute(null), Is.False);
+    }
+
+    [Test]
+    public void RotateDialog_SliderAndBoxStayInStepAndPreview()
+    {
+        var previews = new List<RotateRequest>();
+        var dialog = new RotateViewModel(previews.Add);
+
+        dialog.SliderAngle = 44.6;
+        Assert.That(dialog.Angle, Is.EqualTo(45m));
+        dialog.Angle = -60;
+        Assert.That(dialog.SliderAngle, Is.EqualTo(-60));
+        dialog.Expand = false;
+
+        Assert.That(previews, Is.EqualTo(new[]
+        {
+            new RotateRequest(45, true), new RotateRequest(-60, true), new RotateRequest(-60, false)
+        }));
+    }
+
+    [Test]
+    public void RotateDialog_RefusesAnglesOutOfRange()
+    {
+        var dialog = new RotateViewModel { Angle = 181 };
+        Assert.That(dialog.AcceptCommand.CanExecute(null), Is.False);
+        dialog.Angle = -181;
+        Assert.That(dialog.AcceptCommand.CanExecute(null), Is.False);
+        dialog.Angle = null;
+        Assert.That(dialog.AcceptCommand.CanExecute(null), Is.False);
+        dialog.Angle = -180;
+        Assert.That(dialog.AcceptCommand.CanExecute(null), Is.True);
+        dialog.Angle = 180;
+        Assert.That(dialog.AcceptCommand.CanExecute(null), Is.True);
+    }
+
+    [Test]
+    public async Task Keyboard_ListsEveryToolsHotkey()
+    {
+        await _main.KeyboardCommand.ExecuteAsync(null);
+
+        var tools = _dialogs.Shortcuts!.Single(group => group.Name == "Tools").Shortcuts;
+        foreach (var tool in _main.Toolbox.Tools)
+            Assert.That(tools, Does.Contain(new Shortcut(tool.Hotkey.ToString(), tool.Name)));
+    }
+
+    /// <summary>
+    ///     Every key binding in the main window is in the Keyboard table, so adding a shortcut without
+    ///     listing it fails here.
+    /// </summary>
+    [Test]
+    public void Keyboard_ListsEveryKeyBindingOfTheMainWindow()
+    {
+        string xaml = File.ReadAllText(SourcePath("Paintty", "Views", "MainWindow.axaml"));
+        var gestures = System.Text.RegularExpressions.Regex
+            .Matches(xaml, "<KeyBinding Gesture=\"([^\"]+)\"")
+            .Select(match => match.Groups[1].Value.Replace("+D0", "+0")) // Avalonia's name for the 0 key
+            .ToList();
+        var listed = KeyboardShortcuts.For(_main.Toolbox).SelectMany(group => group.Shortcuts)
+            .Select(shortcut => shortcut.Keys).ToHashSet();
+
+        Assert.That(gestures, Is.Not.Empty);
+        Assert.That(gestures.Where(gesture => !listed.Contains(gesture)), Is.Empty);
+    }
+
+    private static string SourcePath(params string[] parts) =>
+        Path.Combine([Path.GetDirectoryName(ThisFile())!, "..", .. parts]);
+
+    private static string ThisFile([System.Runtime.CompilerServices.CallerFilePath] string path = "") => path;
+
+    [Test]
     public void Toolbox_HotkeysPickTools()
     {
         Assert.That(_main.Toolbox.TrySelect('b'), Is.True);

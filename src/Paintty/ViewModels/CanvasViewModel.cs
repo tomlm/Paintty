@@ -30,6 +30,10 @@ public sealed partial class CanvasViewModel : ObservableObject, IToolHost, IDisp
     private SKBitmap? _composite;
     private bool _renderQueued;
     private bool _pointerDown;
+    private Func<SKBitmap, SKBitmap>? _previewTransform;
+    private SKBitmap? _preview;
+    private bool _previewStale;
+    private bool _disposed;
 
     public CanvasViewModel(Document document, ToolboxViewModel toolbox, PaletteViewModel palette,
         IDialogService dialogs, IDisplayMetrics metrics, Action<Action>? post = null)
@@ -74,10 +78,13 @@ public sealed partial class CanvasViewModel : ObservableObject, IToolHost, IDisp
     public IDisplayMetrics DisplayMetrics => _metrics;
 
     /// <summary>How wide the image is drawn, in cells.</summary>
-    public double DisplayWidth => Document.Width * Zoom / _metrics.PixelsPerCellX;
+    public double DisplayWidth => (_preview?.Width ?? Document.Width) * Zoom / _metrics.PixelsPerCellX;
 
     /// <summary>How tall the image is drawn, in cells.</summary>
-    public double DisplayHeight => Document.Height * Zoom / _metrics.PixelsPerCellY;
+    public double DisplayHeight => (_preview?.Height ?? Document.Height) * Zoom / _metrics.PixelsPerCellY;
+
+    /// <summary>Whether the canvas shows a preview of a transform rather than the document.</summary>
+    public bool IsPreviewing => _previewTransform is not null;
 
     public string ZoomText => $"{Zoom * 100:0.#}%";
 
@@ -170,6 +177,28 @@ public sealed partial class CanvasViewModel : ObservableObject, IToolHost, IDisp
         Zoom = Math.Clamp(Math.Min(fitX, fitY), ZoomLevels[0], ZoomLevels[^1]);
     }
 
+    // ── preview ────────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    ///     Shows <paramref name="transform" /> applied to the image instead of the image itself (a
+    ///     rotation being dialled in, say), or the image again when null. The transform runs when the
+    ///     canvas next renders, so a slider dragged quickly costs one transform per frame, not per step.
+    /// </summary>
+    public void SetPreview(Func<SKBitmap, SKBitmap>? transform)
+    {
+        _previewTransform = transform;
+        _previewStale = transform is not null;
+        if (transform is null && _preview is not null)
+        {
+            _preview.Dispose();
+            _preview = null;
+            OnSizeChanged();
+            return;
+        }
+
+        QueueRender();
+    }
+
     // ── rendering ──────────────────────────────────────────────────────────────────────────
 
     partial void OnDocumentChanged(Document? oldValue, Document newValue)
@@ -215,29 +244,52 @@ public sealed partial class CanvasViewModel : ObservableObject, IToolHost, IDisp
 
     internal void Render()
     {
+        // a render queued just before the window closed would draw a disposed document
+        if (_disposed) return;
         var document = Document;
-        if (_composite is null || _composite.Width != document.Width || _composite.Height != document.Height)
+        UpdatePreview();
+        var shown = _preview ?? document.Bitmap;
+        if (_composite is null || _composite.Width != shown.Width || _composite.Height != shown.Height)
         {
             _composite?.Dispose();
-            _composite = new SKBitmap(Bitmaps.Info(document.Width, document.Height));
+            _composite = new SKBitmap(Bitmaps.Info(shown.Width, shown.Height));
         }
 
         using (var canvas = new SKCanvas(_composite))
         {
-            DrawCheckerboard(canvas, document.Width, document.Height);
-            canvas.DrawBitmap(document.Bitmap, 0, 0);
+            DrawCheckerboard(canvas, shown.Width, shown.Height);
+            canvas.DrawBitmap(shown, 0, 0);
 
-            if (document.Floating is { } floating && document.Selection is { } at)
-                canvas.DrawBitmap(floating, at.Left, at.Top);
-            if (document.Selection is { } selection)
-                DrawMarquee(canvas, selection);
-
-            Toolbox.SelectedTool.DrawOverlay(canvas);
+            // a preview shows a picture that isn't there yet, so nothing drawn over the image applies
+            if (_preview is null)
+            {
+                if (document.Floating is { } floating && document.Selection is { } at)
+                    canvas.DrawBitmap(floating, at.Left, at.Top);
+                if (document.Selection is { } selection)
+                    DrawMarquee(canvas, selection);
+                Toolbox.SelectedTool.DrawOverlay(canvas);
+            }
         }
 
         var old = DisplayBitmap;
         DisplayBitmap = new AvaloniaBitmap(PixelFormat.Bgra8888, AlphaFormat.Premul, _composite.GetPixels(),
             new PixelSize(_composite.Width, _composite.Height), new Vector(96, 96), _composite.RowBytes);
+        old?.Dispose();
+    }
+
+    /// <summary>Makes the preview again if its transform changed since it was made.</summary>
+    private void UpdatePreview()
+    {
+        if (!_previewStale || _previewTransform is null) return;
+        _previewStale = false;
+        var old = _preview;
+        _preview = _previewTransform(Document.Bitmap);
+        if (old is null || old.Width != _preview.Width || old.Height != _preview.Height)
+        {
+            OnPropertyChanged(nameof(DisplayWidth));
+            OnPropertyChanged(nameof(DisplayHeight));
+        }
+
         old?.Dispose();
     }
 
@@ -270,7 +322,9 @@ public sealed partial class CanvasViewModel : ObservableObject, IToolHost, IDisp
 
     public void Dispose()
     {
+        _disposed = true;
         DisplayBitmap?.Dispose();
         _composite?.Dispose();
+        _preview?.Dispose();
     }
 }

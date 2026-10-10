@@ -45,6 +45,8 @@ internal sealed class FakeDialogs : IDialogService
     public ImageSize? NewSize { get; set; }
     public ResizeRequest? Resize { get; set; }
     public CanvasSizeRequest? CanvasSize { get; set; }
+    public RotateRequest? Rotate { get; set; }
+    public List<RotateRequest> RotatePreviews { get; set; } = [];
     public SKColor? Color { get; set; }
     public string? Text { get; set; }
     public List<string> Errors { get; } = [];
@@ -73,7 +75,28 @@ internal sealed class FakeDialogs : IDialogService
     public Task<ImageSize?> AskNewImageSizeAsync(ImageSize suggested) => Task.FromResult(NewSize);
     public Task<ResizeRequest?> AskResizeAsync(ImageSize current) => Task.FromResult(Resize);
     public Task<CanvasSizeRequest?> AskCanvasSizeAsync(ImageSize current) => Task.FromResult(CanvasSize);
+    /// <summary>Runs while the rotate dialog is "open", after its previews.</summary>
+    public Action? WhileAsking { get; set; }
+
+    public bool? RotatedSelection { get; private set; }
+
+    public Task<RotateRequest?> AskRotateAsync(bool selection, Action<RotateRequest> preview)
+    {
+        RotatedSelection = selection;
+        foreach (var request in RotatePreviews) preview(request);
+        WhileAsking?.Invoke();
+        return Task.FromResult(Rotate);
+    }
+
     public Task<SKColor?> EditColorAsync(SKColor color) => Task.FromResult(Color);
+
+    public IReadOnlyList<ShortcutGroup>? Shortcuts { get; private set; }
+
+    public Task ShowShortcutsAsync(IReadOnlyList<ShortcutGroup> groups)
+    {
+        Shortcuts = groups;
+        return Task.CompletedTask;
+    }
     public Task<string?> PromptTextAsync(string title) => Task.FromResult(Text);
 }
 

@@ -3,6 +3,7 @@
                              xmlns:windowManager="clr-namespace:Iciclecreek.Avalonia.WindowManager;assembly=Iciclecreek.Avalonia.WindowManager"
                              xmlns:dialogs="using:Paintty.ViewModels.Dialogs"
                              xmlns:views="using:Paintty.Views"
+                             xmlns:services="using:Paintty.Services"
                              x:Class="Paintty.Views.Dialogs.DialogWindow"
                              x:DataType="dialogs:IDialogViewModel"
                              Title="{Binding Title}"
@@ -57,6 +58,20 @@
             </StackPanel>
         </DataTemplate>
 
+        <DataTemplate DataType="dialogs:RotateViewModel">
+            <StackPanel Spacing="1">
+                <Grid ColumnDefinitions="Auto,1,36,1,10" RowDefinitions="Auto">
+                    <Label Content="_Angle" Target="AngleSlider" VerticalAlignment="Center" />
+                    <Slider Name="AngleSlider" Grid.Column="2" Minimum="-180" Maximum="180"
+                            SmallChange="1" LargeChange="15" Value="{Binding SliderAngle}" />
+                    <NumericUpDown Grid.Column="4" Value="{Binding Angle}"
+                                   Minimum="-180" Maximum="180" FormatString="0" />
+                </Grid>
+                <TextBlock Text="Degrees: + clockwise, − anticlockwise" Opacity="0.6" />
+                <CheckBox Content="{Binding ExpandText}" IsChecked="{Binding Expand}" />
+            </StackPanel>
+        </DataTemplate>
+
         <DataTemplate DataType="dialogs:ColorEditorViewModel">
             <Grid ColumnDefinitions="Auto,1,32,1,5" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="1">
                 <Label Content="_Red" Target="RedSlider" />
@@ -80,6 +95,32 @@
             </Grid>
         </DataTemplate>
 
+        <DataTemplate DataType="dialogs:ShortcutsViewModel">
+            <!-- focusable, so the dialog opens with focus here and the keys scroll it -->
+            <ScrollViewer MaxHeight="30" HorizontalScrollBarVisibility="Disabled" Focusable="True">
+                <ItemsControl ItemsSource="{Binding Groups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="services:ShortcutGroup">
+                            <StackPanel Margin="0,0,0,1">
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                <ItemsControl ItemsSource="{Binding Shortcuts}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="services:Shortcut">
+                                            <Grid ColumnDefinitions="22,*" Margin="2,0,0,0">
+                                                <TextBlock Text="{Binding Keys}" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Action}" MaxWidth="52"
+                                                           TextWrapping="Wrap" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </DataTemplate>
+
         <DataTemplate DataType="dialogs:TextInputViewModel">
             <TextBox Width="40"
                      Text="{Binding Text}" />
@@ -91,7 +132,8 @@
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right"
                     Spacing="1" Margin="0,1,0,0">
             <Button Name="AcceptButton" Content="O_K" IsDefault="True" Command="{Binding AcceptCommand}" />
-            <Button Content="_Cancel" IsCancel="True" Command="{Binding CancelCommand}" />
+            <Button Content="_Cancel" IsCancel="True" Command="{Binding CancelCommand}"
+                    IsVisible="{Binding CanCancel}" />
         </StackPanel>
         <ContentControl Name="Body" Content="{Binding}" />
     </DockPanel>

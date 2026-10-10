@@ -61,6 +61,42 @@ public static class Adjustments
         });
     }
 
+    /// <summary>
+    ///     Rotates clockwise by any angle. Right angles are exact (see <see cref="Rotate" />); any other
+    ///     angle is resampled smoothly, and the corners it uncovers are transparent.
+    /// </summary>
+    /// <param name="expand">
+    ///     Grow the canvas to the rotated image's bounding box, so nothing is cut off; otherwise keep
+    ///     the size and turn the image about its centre, cropping the corners.
+    /// </param>
+    public static SKBitmap RotateFree(SKBitmap source, double degrees, bool expand)
+    {
+        degrees = ((degrees % 360) + 360) % 360;
+        if (degrees % 90 == 0 && (expand || degrees % 180 == 0 || source.Width == source.Height))
+            return Rotate(source, (int)degrees);
+
+        int width = source.Width, height = source.Height;
+        if (expand)
+        {
+            double radians = degrees * Math.PI / 180;
+            double cos = Math.Abs(Math.Cos(radians)), sin = Math.Abs(Math.Sin(radians));
+            // a hair under, so a rounding error doesn't add a transparent row
+            width = Math.Max(1, (int)Math.Ceiling(source.Width * cos + source.Height * sin - 1e-6));
+            height = Math.Max(1, (int)Math.Ceiling(source.Width * sin + source.Height * cos - 1e-6));
+        }
+
+        using var image = SKImage.FromBitmap(source);
+        using var paint = new SKPaint { IsAntialias = true };
+        var result = new SKBitmap(Bitmaps.Info(width, height));
+        using var canvas = new SKCanvas(result);
+        canvas.Clear(SKColors.Transparent);
+        canvas.Translate(width / 2f, height / 2f);
+        canvas.RotateDegrees((float)degrees);
+        canvas.Translate(-source.Width / 2f, -source.Height / 2f);
+        canvas.DrawImage(image, 0, 0, new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None), paint);
+        return result;
+    }
+
     /// <summary>Scales the image to a new size; <paramref name="smooth" /> off keeps hard pixel edges.</summary>
     public static SKBitmap Resize(SKBitmap source, int width, int height, bool smooth = true)
     {

@@ -116,6 +116,57 @@ public sealed partial class Document : ObservableObject, IDisposable
         scope.Touch(region);
     }
 
+    /// <summary>
+    ///     Applies a transform that may change the size (a rotation) to the selection when there is one,
+    ///     otherwise to the whole image. The selection is lifted first, leaving <paramref name="hole" />,
+    ///     and the result floats centred where the selection was, so it can be moved before it is put down.
+    /// </summary>
+    public void TransformSelectionOrImage(string name, Func<SKBitmap, SKBitmap> transform, SKColor hole)
+    {
+        if (Selection is null)
+        {
+            ApplyToImage(name, transform);
+            return;
+        }
+
+        LiftSelection(hole, name);
+        if (Floating is not { } floating || Selection is not { } region) return;
+        var result = transform(floating);
+        if (ReferenceEquals(result, floating)) return;
+
+        floating.Dispose();
+        Floating = result;
+        Selection = Centered(region, result.Width, result.Height);
+        Revision++;
+    }
+
+    /// <summary>
+    ///     What <see cref="TransformSelectionOrImage" /> would make, as a new bitmap of the whole
+    ///     image, without changing anything: for previewing it.
+    /// </summary>
+    public SKBitmap PreviewTransformSelectionOrImage(Func<SKBitmap, SKBitmap> transform, SKColor hole)
+    {
+        if (Selection is not { } region)
+            return transform(_bitmap);
+
+        var preview = _bitmap.Copy(_bitmap.Bounds());
+        using var lifted = Floating is { } floating ? floating.Copy(floating.Bounds()) : _bitmap.Copy(region);
+        if (Floating is null)
+            preview.FillRect(region, hole);
+        using var result = transform(lifted);
+        var at = Centered(region, result.Width, result.Height);
+        preview.Composite(result, at.Left, at.Top);
+        return preview;
+    }
+
+    /// <summary>A <paramref name="width" /> × <paramref name="height" /> rectangle with the same centre as <paramref name="around" />.</summary>
+    private static SKRectI Centered(SKRectI around, int width, int height)
+    {
+        int left = around.Left + (around.Width - width) / 2;
+        int top = around.Top + (around.Height - height) / 2;
+        return new SKRectI(left, top, left + width, top + height);
+    }
+
     public void Undo()
     {
         CommitFloating();
@@ -181,11 +232,12 @@ public sealed partial class Document : ObservableObject, IDisposable
     }
 
     /// <summary>Lifts the selected pixels so they can be moved, leaving <paramref name="hole" /> behind.</summary>
-    public void LiftSelection(SKColor hole)
+    /// <param name="name">What undo calls the move: the lift, and whatever is done to the pixels until they are put down.</param>
+    public void LiftSelection(SKColor hole, string name = "Move Selection")
     {
         if (Floating is not null || Selection is not { } region) return;
 
-        var scope = BeginEdit("Move Selection");
+        var scope = BeginEdit(name);
         Floating = _bitmap.Copy(region);
         _bitmap.FillRect(region, hole);
         scope.Touch(region);

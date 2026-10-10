@@ -13,6 +13,9 @@ public interface IDialogViewModel
     IRelayCommand AcceptCommand { get; }
     IRelayCommand CancelCommand { get; }
 
+    /// <summary>Whether there is anything to cancel; a dialog that only shows something has just OK.</summary>
+    bool CanCancel { get; }
+
     /// <summary>Raised with the dialog's result (null on cancel) when it should close.</summary>
     event Action<object?>? CloseRequested;
 }
@@ -22,6 +25,8 @@ public abstract partial class DialogViewModel<TResult> : ObservableObject, IDial
     public abstract string Title { get; }
 
     public event Action<object?>? CloseRequested;
+
+    public virtual bool CanCancel => true;
 
     protected virtual bool CanAccept() => true;
 
@@ -126,6 +131,58 @@ public sealed partial class CanvasSizeViewModel(ImageSize current) : DialogViewM
     protected override bool CanAccept() => Limits.IsValid(Width) && Limits.IsValid(Height);
 
     protected override CanvasSizeRequest? CreateResult() => new((int)Width!.Value, (int)Height!.Value, Anchor);
+}
+
+/// <summary>An angle from a slider or typed in, shown on the canvas as it changes.</summary>
+public sealed partial class RotateViewModel(Action<RotateRequest>? preview = null, bool selection = false)
+    : DialogViewModel<RotateRequest?>
+{
+    public override string Title => selection ? "Rotate Selection" : "Rotate";
+
+    public string ExpandText => selection ? "_Expand selection to fit" : "_Expand canvas to fit";
+
+    /// <summary>In degrees, -180 to 180: positive turns clockwise, negative anticlockwise.</summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AcceptCommand))]
+    private decimal? _angle = 0;
+
+    [ObservableProperty] private bool _expand = true;
+
+    /// <summary>The slider's side of <see cref="Angle" />, which can't take an empty value.</summary>
+    public double SliderAngle
+    {
+        get => (double)(Angle ?? 0);
+        set => Angle = Math.Round((decimal)value);
+    }
+
+    partial void OnAngleChanged(decimal? value)
+    {
+        OnPropertyChanged(nameof(SliderAngle));
+        Preview();
+    }
+
+    partial void OnExpandChanged(bool value) => Preview();
+
+    private void Preview()
+    {
+        if (CanAccept()) preview?.Invoke(CreateResult()!);
+    }
+
+    protected override bool CanAccept() => Angle is >= -180 and <= 180;
+
+    protected override RotateRequest? CreateResult() => new((double)Angle!.Value, Expand);
+}
+
+/// <summary>The table of shortcuts behind Help → Keyboard.</summary>
+public sealed class ShortcutsViewModel(IReadOnlyList<ShortcutGroup> groups) : DialogViewModel<bool?>
+{
+    public override string Title => "Keyboard";
+
+    public override bool CanCancel => false;
+
+    public IReadOnlyList<ShortcutGroup> Groups { get; } = groups;
+
+    protected override bool? CreateResult() => true;
 }
 
 /// <summary>RGBA sliders and a hex box, kept in step with each other.</summary>

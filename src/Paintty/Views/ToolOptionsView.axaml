@@ -84,6 +84,11 @@
                                Text="Drag to select · drag inside to move · Esc to drop" />
                 </DataTemplate>
 
+                <DataTemplate DataType="tools:PanTool">
+                    <TextBlock VerticalAlignment="Center" Opacity="0.6"
+                               Text="Drag to move the view · any tool: middle-drag, arrow keys, Shift+wheel · [ ] zoom" />
+                </DataTemplate>
+
                 <DataTemplate DataType="tools:ToolBase">
                     <TextBlock VerticalAlignment="Center" Opacity="0.6"
                                Text="Left button: primary colour · right button: secondary" />
