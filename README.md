@@ -40,5 +40,5 @@ Help → Keyboard… shows the same table inside Paintty.
 | `Ctrl+Shift+H` | Rotate by any angle |
 | | Rotations turn the selection when there is one, leaving it floating to move |
 | `Ctrl+I` `Ctrl+Shift+G` | Invert colours, Black and white |
-| `[` `]` `Ctrl+0` `Ctrl+B` | Zoom in, out, 100%, to window (also `Ctrl`+wheel) |
+| `+` `-` `Ctrl+0` `Ctrl+B` | Zoom in, out, 100%, to window (also `Ctrl`+wheel) |
 | Arrow keys, `Shift`+wheel, middle-drag | Pan (the wheel alone scrolls up and down) |

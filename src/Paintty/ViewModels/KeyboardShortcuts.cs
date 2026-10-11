@@ -54,8 +54,8 @@ public static class KeyboardShortcuts
         ]),
         new("View",
         [
-            new("[", "Zoom in"),
-            new("]", "Zoom out"),
+            new("+", "Zoom in"),
+            new("-", "Zoom out"),
             new("Ctrl+0", "Actual size"),
             new("Ctrl+B", "Zoom to window"),
             new("Arrow keys", "Pan")

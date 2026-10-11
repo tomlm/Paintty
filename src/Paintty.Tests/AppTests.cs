@@ -79,15 +79,27 @@ public class AppTests() : ConsoloniaAppTestBase<App>(new PixelBufferSize(120, 40
     }
 
     [Test]
-    public async Task Brackets_ZoomInAndOut()
+    public async Task PlusAndMinus_ZoomInAndOut()
     {
         double before = await OnUi(() => MainViewModel.Canvas.Zoom);
 
-        await UITest.KeyInput(Key.OemOpenBrackets);
+        await UITest.StringInput("+");
         Assert.That(await OnUi(() => MainViewModel.Canvas.Zoom), Is.GreaterThan(before));
 
-        await UITest.KeyInput(2, Key.OemCloseBrackets);
+        await UITest.StringInput("--");
         Assert.That(await OnUi(() => MainViewModel.Canvas.Zoom), Is.LessThan(before));
+    }
+
+    /// <summary>Zoom goes by the character typed: the = key (OemPlus) without Shift types no +.</summary>
+    [Test]
+    public async Task ThePlusKeyWithoutAPlus_DoesNotZoom()
+    {
+        double before = await OnUi(() => MainViewModel.Canvas.Zoom);
+
+        await UITest.KeyInput(Key.OemPlus);
+        await UITest.KeyInput(Key.OemMinus, RawInputModifiers.Control);
+
+        Assert.That(await OnUi(() => MainViewModel.Canvas.Zoom), Is.EqualTo(before));
     }
 
     [Test]
@@ -99,7 +111,7 @@ public class AppTests() : ConsoloniaAppTestBase<App>(new PixelBufferSize(120, 40
     }
 
     [Test]
-    public async Task Brackets_TypedInATextBox_DoNotZoom()
+    public async Task PlusTypedInATextBox_DoesNotZoom()
     {
         await UITest.KeyInput(Key.T); // the text tool's options have a font size box
         await AssertScreenHas("Bold");
@@ -111,7 +123,7 @@ public class AppTests() : ConsoloniaAppTestBase<App>(new PixelBufferSize(120, 40
         }), Is.True);
         double before = await OnUi(() => MainViewModel.Canvas.Zoom);
 
-        await UITest.KeyInput(Key.OemOpenBrackets);
+        await UITest.StringInput("+");
 
         Assert.That(await OnUi(() => MainViewModel.Canvas.Zoom), Is.EqualTo(before));
     }
@@ -232,7 +244,7 @@ public class AppTests() : ConsoloniaAppTestBase<App>(new PixelBufferSize(120, 40
     /// <summary>Zooms in far enough that the image is larger than the view both ways.</summary>
     private async Task ZoomInAsync()
     {
-        await UITest.KeyInput(6, Key.OemOpenBrackets);
+        await UITest.StringInput("++++++");
         await UITest.WaitRendered();
     }
 

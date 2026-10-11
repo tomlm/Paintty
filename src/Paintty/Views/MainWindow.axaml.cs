@@ -61,16 +61,16 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    ///     Single letters pick tools (and X swaps colours), the way Paint.NET does, and [ and ] zoom in
+    ///     Single letters pick tools (and X swaps colours), the way Paint.NET does, and + and - zoom in
     ///     and out — but only when no text box has the focus, so typing a font name doesn't switch tools.
     ///     The zoom keys are plain keys because terminals keep the Ctrl combinations for themselves. Esc is here rather than
     ///     a key binding so that an open dialog, which handles Esc itself, gets it first.
     /// </summary>
     private void OnToolHotkey(object? sender, KeyEventArgs e)
     {
-        if (e.Handled || e.KeyModifiers != KeyModifiers.None || ViewModel is not { } viewModel) return;
+        if (e.Handled || ViewModel is not { } viewModel) return;
         if (e.Source is Visual source && source.GetSelfAndVisualAncestors().OfType<ManagedWindow>().Any()) return;
-        if (e.Key == Key.Escape)
+        if (e.Key == Key.Escape && e.KeyModifiers == KeyModifiers.None)
         {
             viewModel.EscapeCommand.Execute(null);
             e.Handled = true;
@@ -85,7 +85,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (e.Key is < Key.A or > Key.Z) return;
+        if (e.KeyModifiers != KeyModifiers.None || e.Key is < Key.A or > Key.Z) return;
 
         char letter = (char)('A' + (e.Key - Key.A));
         if (letter == 'X')
@@ -96,19 +96,18 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    ///     The zoom command for [ or ], by the character typed where the terminal reports it (layouts
-    ///     put the brackets on different keys), else by the US key.
+    ///     The zoom command for a typed + or -, by the character, never the key: + is Shift+= on many
+    ///     layouts and a key of its own on others, and the keypad has both. Shift is allowed, for the
+    ///     layouts that need it; Ctrl and Alt are not.
     /// </summary>
-    private System.Windows.Input.ICommand? ZoomKey(KeyEventArgs e) =>
-        e.KeySymbol switch
+    private System.Windows.Input.ICommand? ZoomKey(KeyEventArgs e)
+    {
+        if ((e.KeyModifiers & ~KeyModifiers.Shift) != KeyModifiers.None) return null;
+        return e.KeySymbol switch
         {
-            "[" => ViewModel!.Canvas.ZoomInCommand,
-            "]" => ViewModel!.Canvas.ZoomOutCommand,
-            _ => e.Key switch
-            {
-                Key.OemOpenBrackets => ViewModel!.Canvas.ZoomInCommand,
-                Key.OemCloseBrackets => ViewModel!.Canvas.ZoomOutCommand,
-                _ => null
-            }
+            "+" => ViewModel!.Canvas.ZoomInCommand,
+            "-" => ViewModel!.Canvas.ZoomOutCommand,
+            _ => null
         };
+    }
 }

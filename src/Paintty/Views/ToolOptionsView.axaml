@@ -86,7 +86,7 @@
 
                 <DataTemplate DataType="tools:PanTool">
                     <TextBlock VerticalAlignment="Center" Opacity="0.6"
-                               Text="Drag to move the view · any tool: middle-drag, arrow keys, Shift+wheel · [ ] zoom" />
+                               Text="Drag to move the view · any tool: middle-drag, arrow keys, Shift+wheel · + - zoom" />
                 </DataTemplate>
 
                 <DataTemplate DataType="tools:ToolBase">

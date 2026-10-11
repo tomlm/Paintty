@@ -8,12 +8,12 @@
         Title="{Binding Title}">
     <Window.Styles>
         <managedWindows:AutoManagedWindowStyles />
-        <!-- Avalonia names the bracket keys "Oem4" and "OemCloseBrackets"; show what is on the key -->
+        <!-- zoom goes by the character typed, which no key gesture can say; show the character -->
         <Style Selector="MenuItem.zoomIn /template/ TextBlock#PART_InputGestureText">
-            <Setter Property="Text" Value="[" />
+            <Setter Property="Text" Value="+" />
         </Style>
         <Style Selector="MenuItem.zoomOut /template/ TextBlock#PART_InputGestureText">
-            <Setter Property="Text" Value="]" />
+            <Setter Property="Text" Value="-" />
         </Style>
     </Window.Styles>
 
@@ -88,8 +88,8 @@
                 <MenuItem Header="_Black and White" InputGesture="Ctrl+Shift+G" Command="{Binding GrayscaleCommand}" />
             </MenuItem>
             <MenuItem Header="_View">
-                <MenuItem Classes="zoomIn" Header="Zoom _In" InputGesture="OemOpenBrackets" Command="{Binding Canvas.ZoomInCommand}" />
-                <MenuItem Classes="zoomOut" Header="Zoom _Out" InputGesture="OemCloseBrackets" Command="{Binding Canvas.ZoomOutCommand}" />
+                <MenuItem Classes="zoomIn" Header="Zoom _In" InputGesture="Add" Command="{Binding Canvas.ZoomInCommand}" />
+                <MenuItem Classes="zoomOut" Header="Zoom _Out" InputGesture="Subtract" Command="{Binding Canvas.ZoomOutCommand}" />
                 <MenuItem Header="_Actual Size" InputGesture="Ctrl+D0" Command="{Binding Canvas.ActualSizeCommand}" />
                 <MenuItem Header="Zoom to _Window" InputGesture="Ctrl+B" Command="{Binding Canvas.ZoomToFitCommand}" />
             </MenuItem>
