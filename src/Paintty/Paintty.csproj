@@ -24,8 +24,12 @@
     <Copyright>Tom Laird-McConnell All Rights Reserved</Copyright>
     <RootNamespace>Paintty</RootNamespace>
     <ContentTargetFolders>content</ContentTargetFolders>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <!-- A tool package is the app's whole publish folder, so its .pdb files went into the .nupkg
+         as well as the .snupkg, SkiaSharp's native ones alone some 300 MB unpacked. Paintty's own
+         symbols are embedded in Paintty.dll instead, so stack traces still have line numbers, and
+         no other .pdb is published (see ExcludeSymbolsFromToolPackage). -->
+    <DebugType>embedded</DebugType>
+    <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
     <!-- Consolonia is referenced from source (the bitmapstuff branch) until its bitmap and
          pointer work ships, so a package built now would point at an unpublished Consolonia. -->
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -54,5 +58,14 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Paintty.Tests" />
   </ItemGroup>
+
+  <!-- Keeps the .pdb files of referenced projects and packages (Consolonia's, SkiaSharp's native
+       ones) out of the publish folder, and so out of the tool package. The build output keeps them
+       for debugging. -->
+  <Target Name="ExcludeSymbolsFromToolPackage" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(Extension)' == '.pdb'" />
+    </ItemGroup>
+  </Target>
 
 </Project>
