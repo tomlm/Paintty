@@ -22,6 +22,12 @@ public abstract partial class ShapeTool : ToolBase
 
     protected bool IsDragging => _start is not null;
 
+    public override bool TrySetWidth(int width)
+    {
+        Width = width;
+        return true;
+    }
+
     public override void Press(IToolHost host, ToolPointer pointer)
     {
         _start = _end = pointer.Pixel;

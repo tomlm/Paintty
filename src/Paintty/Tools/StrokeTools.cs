@@ -98,6 +98,12 @@ public sealed partial class BrushTool : StrokeTool
 
     protected override float StrokeWidth => Size;
 
+    public override bool TrySetWidth(int width)
+    {
+        Size = width;
+        return true;
+    }
+
     protected override SKPaint CreatePaint(IToolHost host, PointerButton button) =>
         Paints.Stroke(ColorFor(host, button), Size, Antialias);
 }
@@ -113,6 +119,12 @@ public sealed partial class EraserTool : StrokeTool
     [ObservableProperty] private bool _toTransparent;
 
     protected override float StrokeWidth => Size;
+
+    public override bool TrySetWidth(int width)
+    {
+        Size = width;
+        return true;
+    }
 
     protected override SKPaint CreatePaint(IToolHost host, PointerButton button) =>
         Paints.Stroke(ToTransparent ? SKColors.Transparent : OtherColor(host, button), Size, antialias: false,

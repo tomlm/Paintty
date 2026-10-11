@@ -32,6 +32,9 @@ public sealed partial class ToolboxViewModel : ObservableObject
         return true;
     }
 
+    /// <summary>Gives the selected tool a typed digit as its stroke width; false when it has none.</summary>
+    public bool TrySetWidth(int width) => SelectedTool.TrySetWidth(width);
+
     [RelayCommand]
     private void Select(ToolBase tool) => SelectedTool = tool;
 }

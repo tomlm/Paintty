@@ -18,7 +18,7 @@ public class ViewModelTests
     {
         _dialogs = new FakeDialogs();
         _files = new FakeFiles();
-        var toolbox = new ToolboxViewModel([new SelectTool(), new PencilTool(), new BrushTool(), new FillTool()]);
+        var toolbox = new ToolboxViewModel([new SelectTool(), new PencilTool(), new BrushTool(), new FillTool(), new LineTool()]);
         var palette = new PaletteViewModel(_dialogs);
         // Rendering needs Avalonia's platform; these tests never let a render run.
         var canvas = new CanvasViewModel(Pixels.Blank(), toolbox, palette, _dialogs, new QuadMetrics(), post: _ => { });
@@ -330,6 +330,21 @@ public class ViewModelTests
         Assert.That(_main.Toolbox.TrySelect('b'), Is.True);
         Assert.That(_main.Toolbox.SelectedTool, Is.InstanceOf<BrushTool>());
         Assert.That(_main.Toolbox.TrySelect('Q'), Is.False);
+    }
+
+    [Test]
+    public void Toolbox_DigitsSetTheWidthOfToolsThatHaveOne()
+    {
+        Assert.That(_main.Toolbox.TrySelect('L'), Is.True);
+        Assert.That(_main.Toolbox.TrySetWidth(5), Is.True);
+        Assert.That(_main.Toolbox.Get<LineTool>().Width, Is.EqualTo(5));
+
+        _main.Toolbox.SelectedTool = _main.Toolbox.Get<BrushTool>();
+        Assert.That(_main.Toolbox.TrySetWidth(7), Is.True);
+        Assert.That(_main.Toolbox.Get<BrushTool>().Size, Is.EqualTo(7));
+
+        _main.Toolbox.SelectedTool = _main.Toolbox.Get<PencilTool>();
+        Assert.That(_main.Toolbox.TrySetWidth(3), Is.False);
     }
 
     [Test]

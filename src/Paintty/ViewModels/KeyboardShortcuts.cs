@@ -15,6 +15,7 @@ public static class KeyboardShortcuts
         [
             .. toolbox.Tools.Select(tool => new Shortcut(tool.Hotkey.ToString(), tool.Name)),
             new("X", "Swap the primary and secondary colours"),
+            new("1 – 9", "Width of the brush, eraser, line, rectangle or ellipse"),
             new("Shift while dragging", "Square rectangles and circles; lines snap to 45°"),
             new("Esc", "Abandon the current drag, or drop a floating selection")
         ]),

@@ -45,6 +45,12 @@ public abstract class ToolBase : ObservableObject
 
     public string ToolTip => $"{Name} ({Hotkey})";
 
+    /// <summary>
+    ///     A typed digit while the tool is selected: tools that draw with a stroke width take it as
+    ///     the new width and return true; the rest ignore it.
+    /// </summary>
+    public virtual bool TrySetWidth(int width) => false;
+
     public virtual void Press(IToolHost host, ToolPointer pointer)
     {
     }

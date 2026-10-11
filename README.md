@@ -29,6 +29,7 @@ Help → Keyboard… shows the same table inside Paintty.
 |---|---|
 | `S` `P` `B` `E` `F` `K` `T` `L` `R` `O` `H` | Select, Pencil, Brush, Eraser, Fill, Color picker, Text, Line, Rectangle, Ellipse, Pan |
 | `X` | Swap the primary and secondary colours |
+| `1`–`9` | Width of the brush, eraser, line, rectangle or ellipse, so `L` `5` is a 5-pixel line |
 | `Shift` while dragging | Square rectangles and circles; lines snap to 45° |
 | `Esc` | Abandon the current drag, or drop a floating selection |
 | `Ctrl+N` `Ctrl+O` `Ctrl+S` `Ctrl+Shift+S` `Ctrl+Q` | New, Open, Save, Save As, Exit |

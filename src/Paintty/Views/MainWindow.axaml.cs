@@ -61,8 +61,9 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    ///     Single letters pick tools (and X swaps colours), the way Paint.NET does, and + and - zoom in
-    ///     and out — but only when no text box has the focus, so typing a font name doesn't switch tools.
+    ///     Single letters pick tools (and X swaps colours), the way Paint.NET does, the digits 1–9 set
+    ///     the width of a tool that has one, so L 5 is a 5-pixel line, and + and - zoom in and out — but
+    ///     only when no text box has the focus, so typing a font name doesn't switch tools.
     ///     The zoom keys are plain keys because terminals keep the Ctrl combinations for themselves. Esc is here rather than
     ///     a key binding so that an open dialog, which handles Esc itself, gets it first.
     /// </summary>
@@ -85,7 +86,14 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (e.KeyModifiers != KeyModifiers.None || e.Key is < Key.A or > Key.Z) return;
+        if (e.KeyModifiers != KeyModifiers.None) return;
+        if (WidthDigit(e.Key) is { } width)
+        {
+            e.Handled = viewModel.Toolbox.TrySetWidth(width);
+            return;
+        }
+
+        if (e.Key is < Key.A or > Key.Z) return;
 
         char letter = (char)('A' + (e.Key - Key.A));
         if (letter == 'X')
@@ -94,6 +102,14 @@ public partial class MainWindow : Window
             return;
         e.Handled = true;
     }
+
+    /// <summary>1 to 9 for a digit on the top row or the keypad; null for any other key.</summary>
+    private static int? WidthDigit(Key key) => key switch
+    {
+        >= Key.D1 and <= Key.D9 => key - Key.D0,
+        >= Key.NumPad1 and <= Key.NumPad9 => key - Key.NumPad0,
+        _ => null
+    };
 
     /// <summary>
     ///     The zoom command for a typed + or -, by the character, never the key: + is Shift+= on many
