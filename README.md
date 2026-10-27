@@ -2,13 +2,11 @@
 
 ![Logo](https://raw.githubusercontent.com/tomlm/Paintty/refs/heads/main/icon.png)
 
-# Paintty
 
+# Paintty
 ![Screenshot](https://raw.githubusercontent.com/tomlm/Paintty/refs/heads/main/screenshot.gif)
 
-# Paintty
-
-A paint program for the terminal, in the spirit of Windows Paint and Paint.NET, built on
+Paintty is a paint program for the terminal, in the spirit of Windows Paint and Paint.NET, built on
 [Consolonia](https://github.com/consolonia/consolonia).
 
 The image is drawn with real pixels when the terminal supports Sixel or Kitty graphics (Windows
