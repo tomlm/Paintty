@@ -12,6 +12,13 @@ Paintty is a paint program for the terminal, in the spirit of Windows Paint and 
 The image is drawn with real pixels when the terminal supports Sixel or Kitty graphics (Windows
 Terminal, WezTerm, kitty, foot, …), and with quarter-cell block characters everywhere else.
 
+## Installation
+```
+dotnet tool install -g paintty
+```
+
+## Running
+
 ```
 paintty [image]
 ```
