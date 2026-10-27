@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/Consolonia/">
+    <Project Path="../../Consolonia/src/Consolonia/Consolonia.csproj" />
+    <Project Path="../../Consolonia/src/Consolonia.Controls/Consolonia.Controls.csproj" />
+    <Project Path="../../Consolonia/src/Consolonia.Core/Consolonia.Core.csproj" />
+    <Project Path="../../Consolonia/src/Consolonia.GuiCS/Consolonia.GuiCS.csproj" />
+    <Project Path="../../Consolonia/src/Consolonia.ManagedWindows/Consolonia.ManagedWindows.csproj" />
+    <Project Path="../../Consolonia/src/Consolonia.NUnit/Consolonia.NUnit.csproj" />
+    <Project Path="../../Consolonia/src/Consolonia.PlatformSupport/Consolonia.PlatformSupport.csproj" />
+    <Project Path="../../Consolonia/src/Consolonia.Themes/Consolonia.Themes.csproj" />
+  </Folder>
+  <Project Path="Paintty.Tests/Paintty.Tests.csproj" />
+  <Project Path="Paintty/Paintty.csproj" />
+</Solution>
