@@ -1,3 +1,11 @@
+[![Build and Test](https://github.com/tomlm/Paintty/actions/workflows/BuildAndRunTests.yml/badge.svg)](https://github.com/tomlm/Paintty/actions/workflows/BuildAndRunTests.yml)[![NuGet](https://img.shields.io/nuget/v/Paintty.svg)](https://www.nuget.org/packages/Paintty)
+
+![Logo](https://raw.githubusercontent.com/tomlm/Paintty/refs/heads/main/icon.png)
+
+# Paintty
+
+![Screenshot](https://raw.githubusercontent.com/tomlm/Paintty/refs/heads/main/screenshot.gif)
+
 # Paintty
 
 A paint program for the terminal, in the spirit of Windows Paint and Paint.NET, built on
